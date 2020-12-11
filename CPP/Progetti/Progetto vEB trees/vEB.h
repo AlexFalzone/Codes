@@ -1,4 +1,5 @@
 #include<cmath>
+#include<vector>
 using namespace std;
 
 class vEB
@@ -8,10 +9,11 @@ private:
     int min;
     int max;
 
-    vEB* cluster;
+    vector<vEB*> cluster;
     vEB* summary;
 
-    /*ritorna i (ln(u)/2) bit piu significativi di x
+    /*
+      ritorna i (ln(u)/2) bit piu significativi di x
       che rappresentano il numero di cluster di x
     */
     int high(int x)
@@ -20,8 +22,9 @@ private:
         return floor(x / lower_sqrt);
     }
 
-    /*ritorna i (ln(u)/2) bit meno significativi di x
-        che rappresentano la posizione di x all'interno del suo cluster
+    /*
+      ritorna i (ln(u)/2) bit meno significativi di x
+      che rappresentano la posizione di x all'interno del suo cluster
     */
     int low(int y)
     {
@@ -48,15 +51,25 @@ private:
 
 public:
     //costruttore
-    vEB(); 
+    vEB(int size_universe); 
     
     //distruttore
     ~vEB(); 
 
-    //controlla se val è membro di V
-    bool isMember(vEB V, int val);
+    bool isMember(vEB* V, int val);
 
-    int successor(vEB V, int val);
+    /*
+      Trova il successore.
+      Esso puo trovarsi o nello stesso cluster di val o nel cluster successivo. 
+    */
+    int successor(vEB* V, int val);
+
+    /*
+      Trova il predecessore.
+      Esso puo trovarsi o nello stesso cluster di val o nel cluster precedente. 
+    */
+    int predecessor(vEB* V, int val);
+
 };
 
 
