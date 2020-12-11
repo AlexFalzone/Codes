@@ -47,16 +47,17 @@ private:
     }
 
 public:
-    vEB(); //costruttore
+    //costruttore
+    vEB(); 
     
-    ~vEB(); //distruttore
+    //distruttore
+    ~vEB(); 
 
+    //controlla se val è membro di V
+    bool isMember(vEB V, int val);
+
+    int successor(vEB V, int val);
 };
 
 
 
-int main(int argc, char const *argv[])
-{
-    
-    return 0;
-}
