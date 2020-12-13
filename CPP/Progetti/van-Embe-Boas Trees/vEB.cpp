@@ -45,15 +45,16 @@ bool vEB::isMember(vEB* V, int val)
       se ci troviamo nel caso base con (universe = 2) 
       sappiamo che esso non avrà altri elementi se non 
       min e max, di conseguenza visto che abbiamo saltato
-      la prima condizione, il determinato cluster non elementi
+      la prima condizione, il determinato cluster non elementi,
+      quindi torniamo false
     */
     else if (V->universe == 2)
     {
         return false;
     }
     /*
-      essendo val diverso da min e max, occorre la ricorsione 
-      per cercare all'interno del cluster
+      essendo (val != min) && (val != max) && (universe > 2), occorre la ricorsione 
+      per cercare all'interno del cluster appropriato
     */
     else
     {
