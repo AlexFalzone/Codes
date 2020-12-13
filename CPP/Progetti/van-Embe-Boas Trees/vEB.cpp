@@ -16,14 +16,14 @@ vEB::vEB(int size_universe)
     }
     else
     {   
-        /*per (size_universe > 2) dobbiamo creare ricorsivamente summary e 
+        /*per (size_universe > 2) dobbiamo creare summary e 
           cluster di dimensione pari a sqrt(size_universe) fino a quando 
           saremo nel caso base
         */
         summary = new vEB(sqrt(size_universe));
         cluster = vector<vEB*>(sqrt(size_universe), nullptr);
 
-
+        //in ogni cluster creiamo un albero vEB
         for (int i = 0; i < sqrt(size_universe); i++)
         {
             cluster[i] = new vEB(sqrt(size_universe));
