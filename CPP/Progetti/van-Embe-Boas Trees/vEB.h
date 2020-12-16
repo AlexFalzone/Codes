@@ -1,7 +1,6 @@
 #include<cmath>
 #include<vector>
 using namespace std;
-#define NIL -1;
 
 class vEB
 {
