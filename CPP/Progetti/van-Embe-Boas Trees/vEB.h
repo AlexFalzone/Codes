@@ -1,6 +1,7 @@
 #include<cmath>
 #include<vector>
 using namespace std;
+#define NIL -1;
 
 class vEB
 {
@@ -49,6 +50,19 @@ private:
     return V->max;
   }
 
+  void empy_insert(vEB* V, int val)
+  {
+    V->min = val;
+    V->max = max;
+  }
+
+  void swap(int &a, int&b)
+  {
+    int aux = a;
+    a = b;
+    b = aux;
+  }
+
 public:
   //costruttore
   vEB(int size_universe); 
@@ -56,20 +70,21 @@ public:
   //distruttore
   ~vEB(); 
 
-  bool isMember(vEB* V, int val);
+  bool isMember(vEB*, int);
 
   /*
     Trova il successore.
     Esso puo trovarsi o nello stesso cluster di val o nel cluster successivo. 
   */
-  int successor(vEB* V, int val);
+  int successor(vEB*, int);
 
   /*
     Trova il predecessore.
     Esso puo trovarsi o nello stesso cluster di val o nel cluster precedente. 
   */
-  int predecessor(vEB* V, int val);
+  int predecessor(vEB*, int);
 
+  void insert(vEB*, int);
 
 };
 

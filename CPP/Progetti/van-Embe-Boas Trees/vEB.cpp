@@ -77,14 +77,14 @@ int vEB::successor(vEB* V, int x)
     }
     else
     {
-      return -1;
+      return NIL;
     }
   }
   /*
     se x è strettamente minore dell'elemento minimo
     torniamo quest'ultimo
   */
-  else if ( (V->min != -1) && (x < V->min) )
+  else if ( (V->min != NIL) && (x < V->min) )
   {
     return V->min;
   }
@@ -101,7 +101,7 @@ int vEB::successor(vEB* V, int x)
       qualche elemento che è maggiore di x allora sappiamo 
       che il successore si troverà nel cluster di x.
     */
-    if ( (max_low != -1) && (low(x) < max_low) )
+    if ( (max_low != NIL) && (low(x) < max_low) )
     {
       //determiniamo dove si trova il successore di x
       int offset = successor(V->cluster[V->high(x)], V->low(x));
@@ -115,9 +115,9 @@ int vEB::successor(vEB* V, int x)
       */
       int succ_cluster = successor(V->summary, V->high(x));
            
-      if (succ_cluster == -1)
+      if (succ_cluster == NIL)
       {
-        return -1;
+        return NIL;
       }
       else
       {
@@ -150,7 +150,7 @@ int vEB::predecessor(vEB* V, int x)
     se x è strettamente maggiore dell'elemento massimo
     torniamo quest'ultimo
   */
-  else if ( (V->max != -1) && (x > V->max) )
+  else if ( (V->max != NIL) && (x > V->max) )
   {
     return V->max;
   }
@@ -167,7 +167,7 @@ int vEB::predecessor(vEB* V, int x)
     qualche elemento che è minore di x allora sappiamo 
     che il predecessore si troverà nel cluster di x.
     */
-    if ( (min_low != -1) && (low(x) > min_low) )
+    if ( (min_low != NIL) && (low(x) > min_low) )
     {
       //determiniamo dove si trova il predecessore di x
       int offset = predecessor(V->cluster[V->high(x)], V->low(x));
@@ -181,15 +181,15 @@ int vEB::predecessor(vEB* V, int x)
         */
         int pred_cluster = predecessor(V->summary, V->high(x));
           
-      if (pred_cluster == -1)
+      if (pred_cluster == NIL)
       {   
-        if (V->min != -1 && x > V->min)
+        if ( (V->min != NIL) && (x > V->min) )
         {
           return V->min;
         }
         else
         {
-          return -1;
+          return NIL;
         }
       }
       else
@@ -201,5 +201,54 @@ int vEB::predecessor(vEB* V, int x)
   }
 }
 
-
+void vEB::insert(vEB* V, int x)
+{ 
+  //se l'albero è vuoto 
+  if (V->min == NIL)
+  {
+    /*
+      richiamiamo empty_insert
+      che aggiunge a min e a max
+      il valore da inserire
+    */
+    empy_insert(V, x);
+  }
+  //se l'elemento da inserire è minore del minimo
+  else if (x < V->min)
+  {
+    /*
+      scambiamo x con min e di conseguenza
+      nella nostra x troveremo il valore originale di min.
+      Che andremo a posizionare nel cluster corretto
+    */
+    swap(x, V->min);
+    
+    if (V->universe > 2)
+    {
+      //se il cluster dove andra x (ovvero il min originale) è vuoto
+      if ( minimum(V->cluster[V->high(x)]) == NIL )
+      {
+        //inseriamo il numero di cluster di x nel summary
+        insert(V->summary, V->high(x));
+        
+        //inseriamo x (ovvero il min originale) in un cluster vuoto
+        empy_insert(V->cluster[V->high(x)], low(x));
+      }
+      //se il cluster di x (ovvero il min originale) NON è vuoto
+      else
+      {
+        /*
+          inseriamo x nel suo cluster
+          non occorre aggiornare il summary, in quanto il numero
+          di cluster di x è gia membro del summary
+        */
+        insert(V->cluster[V->high(x)], low(x));
+      }
+    }
+    if (x > V->max)
+    {
+      V->max = x;
+    }
+  }
+}
 
