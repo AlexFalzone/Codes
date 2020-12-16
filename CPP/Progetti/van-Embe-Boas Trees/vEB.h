@@ -52,7 +52,7 @@ private:
   void empy_insert(vEB* V, int val)
   {
     V->min = val;
-    V->max = max;
+    V->max = val;
   }
 
   void swap(int &a, int&b)

@@ -1,4 +1,6 @@
 #include "vEB.h"
+#include<iostream>
+using namespace std;
 
 //costruttore
 vEB::vEB(int size_universe)
@@ -204,6 +206,7 @@ int vEB::predecessor(vEB* V, int x)
 void vEB::insert(vEB* V, int x)
 { 
   //se l'albero è vuoto 
+  cout << "ciao" << endl;
   if (V->min == -1)
   {
     /*
@@ -221,13 +224,16 @@ void vEB::insert(vEB* V, int x)
       nella nostra x troveremo il valore originale di min.
       Che andremo a posizionare nel cluster corretto
     */
+   cout << "secondo if" << endl;
     swap(x, V->min);
     
     if (V->universe > 2)
-    {
+    { 
+      cout << "if universe > 2" << endl;
       //se il cluster dove andra x (ovvero il min originale) è vuoto
       if ( minimum(V->cluster[V->high(x)]) == -1 )
       {
+        cout << "if minimum" << endl;
         //inseriamo il numero di cluster di x nel summary
         insert(V->summary, V->high(x));
         
@@ -252,3 +258,14 @@ void vEB::insert(vEB* V, int x)
   }
 }
 
+int main(int argc, char const *argv[])
+{
+  int universe = 10;
+  vEB* prova = new vEB(universe);
+
+  cout << "prima" << endl;
+  prova->insert(prova, 3);
+  cout << "dopo" << endl;
+
+  return 0;
+}
