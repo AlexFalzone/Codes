@@ -60,7 +60,7 @@ private:
         //  Cerchiamo ricorsivamente x nei nostri casi base.
         else
         {
-            return isMember(V->cluster[V->high(x)], V->low(x))
+            return isMember(V->cluster[V->high(x)], V->low(x));
         }
     }
 
@@ -74,22 +74,25 @@ private:
         V->min = V->max = x;
     }
 
+    void swap(int &a, int&b)
+    {
+        int aux = a;
+        a = b;
+        b = aux;
+    }
 
 public:
     //costruttore
     van_Emde_Boas(int size);
 
-    int minimum(van_Emde_Boas* V)
-    {
-        return (V->min == -1 ? -1 : V->min);
-    }
+    int minimum(van_Emde_Boas* V);
 
-    int maximum(van_Emde_Boas* V)
-    {
-        return (V->max == -1 ? -1 : V->max);
-    }
+    int maximum(van_Emde_Boas* V);
 
     int successor(van_Emde_Boas* V, int x);
 
-    int predecessor(van_Emde_Boas* v, int x);
+    int predecessor(van_Emde_Boas* V, int x);
+
+    void insert(van_Emde_Boas* V, int x);
+
 };  

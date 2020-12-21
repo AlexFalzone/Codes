@@ -31,7 +31,7 @@ van_Emde_Boas::van_Emde_Boas(int size)
         summary = new van_Emde_Boas(num_cluster);
 
         //ogni indice del cluster avrà a sua volta un van_Emde_Boas
-        cluster = vector<van_Emde_Boas*>(num_cluster);
+        cluster = vector<van_Emde_Boas*>(num_cluster, nullptr);
         
         //assegniamo a tutti i cluster la dimensione della radice quadrata di size
         for (int i = 0; i < num_cluster; i++)
@@ -41,10 +41,19 @@ van_Emde_Boas::van_Emde_Boas(int size)
     }
 }
 
+int van_Emde_Boas::maximum(van_Emde_Boas* V)
+{
+    return V->min;
+}
+
+int van_Emde_Boas::minimum(van_Emde_Boas* V)
+{
+    return V->max;
+}
 
 int van_Emde_Boas::successor(van_Emde_Boas* V, int x)
     {   
-        if (universe == 2)
+        if (V->universe == 2)
         {   
             /*
             *   se la dimensione è 2 e la chiave, di cui
@@ -114,7 +123,7 @@ int van_Emde_Boas::successor(van_Emde_Boas* V, int x)
 
 int van_Emde_Boas::predecessor(van_Emde_Boas* V, int x)
 {
-    if (universe == 2)
+    if (V->universe == 2)
         {   
             /*
             *   se la dimensione è 2 e la chiave, di cui
@@ -125,7 +134,7 @@ int van_Emde_Boas::predecessor(van_Emde_Boas* V, int x)
             */
             if ( (x == 1) && (V->min == 0) )
             {
-                return 1;
+                return 0;
             }
             else
             {
@@ -197,7 +206,59 @@ int van_Emde_Boas::predecessor(van_Emde_Boas* V, int x)
         }
 }   
 
+void van_Emde_Boas::insert(van_Emde_Boas* V, int x)
+{   
+    //Se non esiste il minimo, allora l'albero è vuoto.
+    if (V->min == -1)
+    {
+        //Di conseguenza inseriamo la chiave come min e max.
+        empty_insert(V, x);
+    }
+    else 
+    {   
+        if (x < V->min)
+        {
+            /*
+            *   Se la chiave da inserire è minore
+            *   del minimo, scambiamo entrambi.
+            *   Di conseguenza indicheremo con x il minimo
+            *   originale (quello che andremo a sistemare
+            *   nel cluster appropriato) e con V->min la chiave
+            *   originale posizionata come min
+            */
+            swap(V->min, x);
+        }
+        if (V->universe > 2)
+        {   
+            //Determianiamo se il cluster dove andrà x è vuoto.
+            if (minimum(V->cluster[V->high(x)]) == -1)
+            {   
+                /*
+                *   Se il cluster è vuoto, inseriamo il
+                *   numero di cluster di x nel summary.
+                */
+                insert(V->summary, V->high(x));
 
+                //e inseriamo, nel cluster vuoto, x.
+                empty_insert(V->cluster[V->high(x)], V->low(x));
+            }
+            else
+            {   
+                /*
+                *   se il cluster non è vuoto, inseriamo x 
+                *   nel cluster appropriato.
+                */
+                insert(V->cluster[V->high(x)], V->low(x));
+            }
+        }
+
+        if (x > V->max)
+        {
+            V->max = x;
+        }
+    }
+    
+}
 
 
 
@@ -205,9 +266,24 @@ int van_Emde_Boas::predecessor(van_Emde_Boas* V, int x)
 
 int main(int argc, char const *argv[])
 {
-    van_Emde_Boas* prova = new van_Emde_Boas(10);
+    van_Emde_Boas* prova = new van_Emde_Boas(16);
 
-    std::cout << prova->maximum(prova) << std::endl;
+    prova->insert(prova, 2);
+    prova->insert(prova, 3);
+    prova->insert(prova, 4);
+    prova->insert(prova, 5);
+    prova->insert(prova, 7);
+    prova->insert(prova, 14);
+    prova->insert(prova, 15);
+    
+
+
+    std::cout << "maximum: " << prova->maximum(prova) << std::endl;
+    std::cout << "minimum: " << prova->minimum(prova) << std::endl;
+    std::cout << "successor: " << prova->successor(prova, 4) << std::endl;
+    std::cout << "predecessor: " << prova->predecessor(prova, 4) << std::endl;
+
+
 
     return 0;
 }
