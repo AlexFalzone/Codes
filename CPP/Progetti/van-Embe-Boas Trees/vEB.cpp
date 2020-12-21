@@ -43,12 +43,12 @@ van_Emde_Boas::van_Emde_Boas(int size)
 
 int van_Emde_Boas::maximum(van_Emde_Boas* V)
 {
-    return V->min;
+    return V->max;
 }
 
 int van_Emde_Boas::minimum(van_Emde_Boas* V)
 {
-    return V->max;
+    return V->min;
 }
 
 int van_Emde_Boas::successor(van_Emde_Boas* V, int x)
@@ -260,7 +260,57 @@ void van_Emde_Boas::insert(van_Emde_Boas* V, int x)
     
 }
 
+void van_Emde_Boas::canc(van_Emde_Boas* V, int x)
+{
+    if (V->min == V->max)
+    {
+        V->max = V->min = -1;
+    }
+    else if (V->universe == 2)
+    {
+        if (x == 0)
+        {
+            V->min = 1;
+        }
+        else
+        {
+            V->min = 0;
+        }
+        V->max = V->min;
+    }
+    else if (x == V->min)
+    {
+        int first_cluster = minimum(V->summary);
+        x = index(first_cluster, minimum(V->cluster[first_cluster]));
+        V->min = x;
+        canc(V->cluster[V->high(x)], V->low(x));
 
+        if (minimum(V->cluster[V->high(x)]) == -1)
+        {
+            canc(V->summary, V->high(x));
+            
+            if (x == V->max)
+            {
+                int summary_max = maximum(V->summary);
+
+                if (summary_max == -1)
+                {
+                    V->max = V->min;
+                }
+                else
+                {
+                    V->max = V->index(summary_max, maximum(V->cluster[summary_max]));
+                }
+            }
+        }
+        else if (x == V->max)
+        {
+            V->max = V->index(V->high(x), maximum(V->cluster[V->high(x)]));
+        }
+        
+    }
+    
+}
 
 
 
@@ -280,8 +330,11 @@ int main(int argc, char const *argv[])
 
     std::cout << "maximum: " << prova->maximum(prova) << std::endl;
     std::cout << "minimum: " << prova->minimum(prova) << std::endl;
-    std::cout << "successor: " << prova->successor(prova, 4) << std::endl;
-    std::cout << "predecessor: " << prova->predecessor(prova, 4) << std::endl;
+    std::cout << "successor: " << prova->successor(prova, 14) << std::endl;
+    std::cout << "predecessor: " << prova->predecessor(prova, 14) << std::endl;
+
+    prova->canc(prova, 7);
+    std::cout << "predecessor: " << prova->predecessor(prova, 14) << std::endl;
 
 
 

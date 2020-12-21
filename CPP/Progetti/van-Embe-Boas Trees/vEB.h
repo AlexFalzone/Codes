@@ -95,4 +95,5 @@ public:
 
     void insert(van_Emde_Boas* V, int x);
 
+    void canc(van_Emde_Boas* V, int x);
 };  
