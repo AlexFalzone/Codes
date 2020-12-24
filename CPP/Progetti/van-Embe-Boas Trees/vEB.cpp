@@ -261,34 +261,56 @@ void van_Emde_Boas::insert(van_Emde_Boas* V, int x)
 }
 
 void van_Emde_Boas::canc(van_Emde_Boas* V, int x)
-{
+{   
+    /*
+    *   Se l'albero (o un determinato cluster) ha una sola chiave
+    *   essa sarà quella che vogliamo eliminare,
+    *   di conseguenza settiamo min e max a -1.
+    */
     if (V->min == V->max)
-    {
+    {   
         V->max = V->min = -1;
     }
+
+    /*
+    *   Se l'albero (o un determinato cluster) ha dimensione 2 
+    *   ma piu' chiavi (infatti abbiamo saltato il primo if)
+    */
     else if (V->universe == 2)
-    {
+    {   
+        //se la chiave da eliminare ha indice 0
         if (x == 0)
         {
+            //allora settiamo il minimo al successore di x
             V->min = 1;
         }
         else
         {
+            //in questo caso la chiave da eliminare è 1
             V->min = 0;
         }
+
+        /*
+        *   settiamo min = max perchè adesso l'albero 
+        *   (o un determinato cluster) avrà un solo elemento
+        */
         V->max = V->min;
     }
-    else if (x == V->min)
+    else 
     {
-        int first_cluster = minimum(V->summary);
-        x = index(first_cluster, minimum(V->cluster[first_cluster]));
-        V->min = x;
+        if (x == V->min)
+        {
+            int first_cluster = minimum(V->summary);
+            x = V->index(first_cluster, minimum(V->cluster[first_cluster]));
+            V->min = x;
+        }
+
         canc(V->cluster[V->high(x)], V->low(x));
 
         if (minimum(V->cluster[V->high(x)]) == -1)
         {
             canc(V->summary, V->high(x));
-            
+                
             if (x == V->max)
             {
                 int summary_max = maximum(V->summary);
@@ -307,7 +329,6 @@ void van_Emde_Boas::canc(van_Emde_Boas* V, int x)
         {
             V->max = V->index(V->high(x), maximum(V->cluster[V->high(x)]));
         }
-        
     }
     
 }
