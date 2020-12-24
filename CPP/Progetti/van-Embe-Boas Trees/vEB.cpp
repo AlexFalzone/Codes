@@ -1,5 +1,6 @@
 #include "vEB.h"
 #include<iostream>
+using namespace std;
 
 //costruttore
 van_Emde_Boas::van_Emde_Boas(int size)
@@ -50,6 +51,33 @@ int van_Emde_Boas::minimum(van_Emde_Boas* V)
 {
     return V->min;
 }
+
+bool van_Emde_Boas::isMember(van_Emde_Boas* V, int x)
+    {
+        /*
+        *   se x è uguale al massimo o al minimo
+        *   ritorniamo true.
+        */
+        if ( (x == V->min) || (x == V->max) ) 
+        {
+            return true;
+        }
+        /*
+        *   Se la dimensione dell'universo è 2
+        *   ed abbiamo saltato il primo caso, allora 
+        *   x non sarà nè il min nè il max.
+        *   Quindi torniamo false.
+        */
+        else if (V->universe == 2)
+        {
+            return false;
+        }
+        //  Cerchiamo ricorsivamente x nei nostri casi base.
+        else
+        {
+            return isMember(V->cluster[V->high(x)], V->low(x));
+        }
+    }
 
 int van_Emde_Boas::successor(van_Emde_Boas* V, int x)
     {   
@@ -274,59 +302,97 @@ void van_Emde_Boas::canc(van_Emde_Boas* V, int x)
 
     /*
     *   Se l'albero (o un determinato cluster) ha dimensione 2 
-    *   ma piu' chiavi (infatti abbiamo saltato il primo if)
+    *   ma piu' chiavi (infatti abbiamo saltato il primo if).
     */
     else if (V->universe == 2)
     {   
-        //se la chiave da eliminare ha indice 0
+        //Se la chiave da eliminare ha indice 0.
         if (x == 0)
         {
-            //allora settiamo il minimo al successore di x
+            //Allora settiamo il minimo al successore di x.
             V->min = 1;
         }
         else
         {
-            //in questo caso la chiave da eliminare è 1
+            //In questo caso la chiave da eliminare è 1.
             V->min = 0;
         }
 
         /*
-        *   settiamo min = max perchè adesso l'albero 
-        *   (o un determinato cluster) avrà un solo elemento
+        *   Settiamo min = max perchè adesso l'albero 
+        *   (o un determinato cluster) avrà un solo elemento.
         */
         V->max = V->min;
     }
+    //Abbiamo due o piu' elementi.
     else 
-    {
+    {   
+        //Se l'elemento da cancellare è il minimo di un cluster.
         if (x == V->min)
-        {
+        {   
+            /*
+            *   Troviamo il numero del cluster che contiene
+            *   il piu' piccolo elemento diverso da min .
+            */
             int first_cluster = minimum(V->summary);
+
+            //Impostiamo x al piu' piccolo elemento di tale cluster.
             x = V->index(first_cluster, minimum(V->cluster[first_cluster]));
+
             V->min = x;
         }
 
+        /*
+        *   Cancelliamo x, sia che x sia il valore
+        *   originariamente passato sia che x sia l'elemento
+        *   che deve diventare il nuovo minimo.
+        */
         canc(V->cluster[V->high(x)], V->low(x));
 
+        //Dopo l'eliminazione di x il suo cluster potrebbe essere vuoto.
         if (minimum(V->cluster[V->high(x)]) == -1)
-        {
+        {   
+            //Se lo è eliminiamo il numero di cluster dal summary.
             canc(V->summary, V->high(x));
-                
+
+            //Se stiamo eliminando l'elemento massimo.
             if (x == V->max)
-            {
+            {   
+                /*
+                *   Impostiamo summary_max al numero
+                *   del cluster non vuoto con il numero 
+                *   piu' grande.
+                */
                 int summary_max = maximum(V->summary);
 
+                //Se tutti i cluster sono vuoti.
                 if (summary_max == -1)
-                {
+                {   
+                    /*
+                    *   L'unico elemento sarà min.
+                    *   Di conseguenza diverrà anche 
+                    *   il max.
+                    */
                     V->max = V->min;
                 }
                 else
-                {
+                {   
+                    /*
+                    *   Altrimenti impostiamo max al massimo elemento
+                    *   nel cluster con il numero piu' grande.
+                    */
                     V->max = V->index(summary_max, maximum(V->cluster[summary_max]));
                 }
             }
         }
+        /*
+        *   Se il cluster (dopo l'eliminazione di x)
+        *   non è vuoto potrebbe essere necessario
+        *   aggiornare max. Nel caso l'aggiorna prendendo
+        *   il massimo dal cluster appropriato.
+        */
         else if (x == V->max)
-        {
+        {   
             V->max = V->index(V->high(x), maximum(V->cluster[V->high(x)]));
         }
     }
@@ -334,30 +400,37 @@ void van_Emde_Boas::canc(van_Emde_Boas* V, int x)
 }
 
 
-
 int main(int argc, char const *argv[])
-{
-    van_Emde_Boas* prova = new van_Emde_Boas(16);
-
+{   
+    van_Emde_Boas* prova = new van_Emde_Boas(100);
+    
+    prova->insert(prova, 1);
     prova->insert(prova, 2);
     prova->insert(prova, 3);
     prova->insert(prova, 4);
     prova->insert(prova, 5);
+    prova->insert(prova, 6);
     prova->insert(prova, 7);
-    prova->insert(prova, 14);
-    prova->insert(prova, 15);
-    
+    prova->insert(prova, 8);
+    prova->insert(prova, 9);
+    prova->insert(prova, 10);
 
 
-    std::cout << "maximum: " << prova->maximum(prova) << std::endl;
-    std::cout << "minimum: " << prova->minimum(prova) << std::endl;
-    std::cout << "successor: " << prova->successor(prova, 14) << std::endl;
-    std::cout << "predecessor: " << prova->predecessor(prova, 14) << std::endl;
+    cout << "\nPrima dell'eliminazione" << endl;
+    cout << "masssimo = " << prova->maximum(prova) << endl;
+    cout << "minimo = " << prova->minimum(prova) << endl;
+    cout << "Successore di 8 = " << prova->successor(prova, 8) << endl;
+    cout << "Predecessore di 8 = " << prova->predecessor(prova, 8) << endl;
 
+    prova->canc(prova, 9);
     prova->canc(prova, 7);
-    std::cout << "predecessor: " << prova->predecessor(prova, 14) << std::endl;
+    prova->canc(prova, 10);
 
-
+    cout << "\nDopo dell'eliminazione" << endl;
+    cout << "masssimo = " << prova->maximum(prova) << endl;
+    cout << "minimo = " << prova->minimum(prova) << endl;
+    cout << "Successore di 8 = " << prova->successor(prova, 8) << endl;
+    cout << "Predecessore di 8 = " << prova->predecessor(prova, 8) << endl;
 
     return 0;
 }

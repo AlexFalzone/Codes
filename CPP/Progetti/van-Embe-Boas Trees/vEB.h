@@ -37,33 +37,6 @@ private:
         return ( (x*lower_square) + y);
     }
 
-    bool isMember(van_Emde_Boas* V, int x)
-    {
-        /*
-        *   se x è uguale al massimo o al minimo
-        *   ritorniamo true.
-        */
-        if ( (x == V->min) || (x == V->max) ) 
-        {
-            return true;
-        }
-        /*
-        *   Se la dimensione dell'universo è 2
-        *   ed abbiamo saltato il primo caso, allora 
-        *   x non sarà nè il min nè il max.
-        *   Quindi torniamo false.
-        */
-        else if (V->universe == 2)
-        {
-            return false;
-        }
-        //  Cerchiamo ricorsivamente x nei nostri casi base.
-        else
-        {
-            return isMember(V->cluster[V->high(x)], V->low(x));
-        }
-    }
-
     /*
     *   se l'albero è vuoto inseriamo il nostro 
     *   elemento (x) come minimo e massimo 
@@ -89,11 +62,14 @@ public:
 
     int maximum(van_Emde_Boas* V);
 
+    bool isMember(van_Emde_Boas* V, int x);
+
     int successor(van_Emde_Boas* V, int x);
 
     int predecessor(van_Emde_Boas* V, int x);
 
     void insert(van_Emde_Boas* V, int x);
 
+    //delete
     void canc(van_Emde_Boas* V, int x);
 };  
