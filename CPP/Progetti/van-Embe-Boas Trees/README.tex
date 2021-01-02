@@ -1,0 +1,61 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\title{README.md}
+\author{Alex Falzone }
+\date{January 2021}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+    Creata nel 1975 dall'informatico Peter van Emde Boas.\\
+    Questo albero ha la particolare caratteristica di svolgere le operazioni di search, insert, delete, minimum, maximum, successor, predecessor nel tempo O(lg lg u) dove u rappresenta la dimensione dell'universo.\\
+    Possiamo pensare a quest'albero come un array A (diviso in $\sqrt{u}$ parti) contenenti 0 o 1. 
+    Definito un array \textbf{summary}[0 $\dots$ $\sqrt{u}$ - 1], dove summary[i] contiene 1 se e soltanto se il sottoarray A[ i$\sqrt{u}$ $\dots$ (i + 1)$\sqrt{u}$ - 1] contiene almeno un 1. Questo sottoarray di A di $\sqrt{u}$ bit è detto i-esimo.\\ \textbf{cluster}.
+
+
+\section{Struttura dell'albero}
+    Indichiamo con $\sqrt[\downarrow]{u}$ la radice quadrata \textbf{inferiore}, ovvero 
+    \begin{equation}
+        \centering2^{\lfloor lg(u) / 2 \rfloor}.
+    \end{equation}
+    Mentre con $\sqrt[\uparrow]{u}$ la radice \textbf{superiore}, ovvero 
+    \begin{equation}
+        \centering2^{\lceil lg(u) / 2 \rceil}
+    \end{equation}
+    Denotiamo con vEB(u) un albero vEB con dimensione dell'universo pari a \textbf{u} e, a meno che u non sia uguale alla dimensione base 2, l'attributo summary punta a un albero vEB($\sqrt[\uparrow]{u}$) e l'array cluster[ 0 $\dots$ $\sqrt[\uparrow]{u}$ - 1] punta ai $\sqrt[\uparrow]{u}$ alberi vEB($\sqrt[\downarrow]{u}$).\\
+    Inoltre all'interno di un cluster è presente un valore \textbf{min} e un valore \textbf{max}. Banalmente memorizzano rispettivamente l'elemento minimo e massimo nell'albero vEB. Inoltre è importante notare che l'elemento memorizzato in \textbf{min} non appare in nessuno degli albero di ricorsione vEB($\sqrt[\downarrow]{u}$) cui punta l'array cluster (diversamente accade per \textbf{max}).\\
+    Successivamente è necessario stabilire come accedere sia al numero di cluster di un determinato valore(x), sia alla posizione del valore(x) all'interno del cluster; Esso avviene usando rispettivamente:\\
+    \begin{equation}
+        high(x) = \lfloor x / \sqrt[\downarrow]{u} \rfloor
+    \end{equation}
+    \begin{equation}
+        low(x) = x mod \sqrt[\downarrow]{u}
+    \end{equation}
+    \begin{equation}
+        index(x, y) = (x\sqrt[\downarrow]{u}) + y
+    \end{equation}
+    Dove index rappresenta il numero(x) e la posizione(y) del cluster. 
+    \\
+
+    \subsection{Operazioni vEB}
+        \subsubsection{Minimo e massimo}
+            \begin{algorithm}
+                \caption{Minimum(V)}
+                    {return V.min}
+            \end{algorithm}
+           \begin{algorithm}
+                \caption{Maximum(V)}
+                    {return V.max}
+            \end{algorithm}
+            
+            Poiché il massimo e il minimo sono memorizzati negli attribuiti \textbf{min} e \textbf{max} essi richiedono tempo costante, ovvero O(1).
+        
+        \subsubsection{Successore e Predecessore}
+            
+            
+\end{document}
