@@ -2,7 +2,7 @@
 
                                                                                                                                 by Alex Falzone
 
-- **Introduzione**:<br>Creata nel 1975 dall'informatico Peter van Emde Boas. <br>Questo albero ha la particolare caratteristica di svolgere le operazioni di search, insert, delete, minimum, maximum, successor, predecessor nel tempo O(lg lg u) dove u rappresenta la dimensione dell'universo.<br>Possiamo pensare a quest'albero come un array A (diviso in $\sqrt{u}$ parti) contenenti 0 o 1. Definito un array ***summary***[0 $\dots$ $\sqrt{u}$ - 1], dove summary[ i ] contiene 1 se e soltanto se il sottoarray A[ i$\sqrt{u}$ $\dots$ (i + 1)$\sqrt{u}$ - 1 ] contiene almeno un 1. Questo sottoarray di A di $\sqrt{u}$ bit è detto i-esimo ***cluster***. 
+- **Introduzione**:<br>Creata nel 1975 dall'informatico Peter van Emde Boas. <br>Questo albero ha la particolare caratteristica di svolgere le operazioni di search, insert, delete, minimum, maximum, successor, predecessor nel tempo O(lg lg u) dove u rappresenta la dimensione dell'universo.<br>Possiamo pensare a quest'albero come un array A (diviso in $\sqrt{u}$ parti) contenenti 0 o 1. Definito un array ***summary***[0 $\dots$ $\sqrt{u}$ - 1], dove summary[ i ] contiene 1 se e soltanto se il sottoarray A[ i\sqrt{u} \dots (i + 1)\sqrt{u} - 1 ] contiene almeno un 1. Questo sottoarray di A di $\sqrt{u}$ bit è detto i-esimo ***cluster***. 
   
   ---
   
