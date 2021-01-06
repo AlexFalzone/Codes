@@ -2,10 +2,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{listings}
 
-\title{README.md}
+\title{\textbf{Van Emde Boas tree}}
 \author{Alex Falzone }
-\date{January 2021}
+\date{2020/2021}
 
 \begin{document}
 
@@ -15,7 +16,7 @@
     Creata nel 1975 dall'informatico Peter van Emde Boas.\\
     Questo albero ha la particolare caratteristica di svolgere le operazioni di search, insert, delete, minimum, maximum, successor, predecessor nel tempo O(lg lg u) dove u rappresenta la dimensione dell'universo.\\
     Possiamo pensare a quest'albero come un array A (diviso in $\sqrt{u}$ parti) contenenti 0 o 1. 
-    Definito un array \textbf{summary}[0 $\dots$ $\sqrt{u}$ - 1], dove summary[i] contiene 1 se e soltanto se il sottoarray A[ i$\sqrt{u}$ $\dots$ (i + 1)$\sqrt{u}$ - 1] contiene almeno un 1. Questo sottoarray di A di $\sqrt{u}$ bit è detto i-esimo.\\ \textbf{cluster}.
+    Definito un array \textbf{summary}[0 $\dots$ $\sqrt{u}$ - 1], dove summary[i] contiene 1 se e soltanto se il sottoarray A[ i$\sqrt{u}$ $\dots$ (i + 1)$\sqrt{u}$ - 1] contiene almeno un 1. Questo sottoarray di A di $\sqrt{u}$ bit è detto i-esimo \textbf{cluster}.\\
 
 
 \section{Struttura dell'albero}
@@ -41,8 +42,28 @@
     \end{equation}
     Dove index rappresenta il numero(x) e la posizione(y) del cluster. 
     \\
+    Inoltre è importante fissare una ricorrenza che tornerà  utile nei costi delle singole operazioni.
+    \begin{equation}
+        T(u) \leq T(\sqrt[\uparrow]{u}) + O(1)
+    \end{equation}
+    Ponendo $m = lg (u)$ abbiamo:
+    \begin{equation}
+        T(2^m) \leq T(2^{\lceil m/2 \rceil} +O(1)
+    \end{equation}
+    Poiché $\lceil$ m/2 $\rceil$ $\leq 2m/3$ per ogni $m \ge 2$, si ha
+    \begin{equation}
+        T(2^m) \leq T(2^{2m/3} + O(1)
+    \end{equation}
+    Ponendo S(m) = T($2^m$), riscriviamo l'occorrenza come
+    \begin{equation}
+        S(m) \leq S(2m/3) + O(1)
+    \end{equation}
+    Grazie al secondo caso del teorema master la ricorrenza ha soluzione S(m) = O(lg m).\\
+    Dunque abbiamo T(u) = T($2^m$) = S(m) = O(lg m) = O(lg lg u)
+    
 
     \subsection{Operazioni vEB}
+    
         \subsubsection{Minimo e massimo}
             \begin{algorithm}
                 \caption{Minimum(V)}
@@ -56,6 +77,131 @@
             Poiché il massimo e il minimo sono memorizzati negli attribuiti \textbf{min} e \textbf{max} essi richiedono tempo costante, ovvero O(1).
         
         \subsubsection{Successore e Predecessore}
+            \textbf{Successore}\\
             
+            \begin{algorithm}
+                \caption{Successor(V, key)}
+                \begin{algorithmic}
+                    \IF{($V.universe == 2$)}
+                    
+                        \IF{( ($key == 0$) \textbf{and} ($V.max == 1$) )}
+                            \STATE \textbf{return} 1
+                        \ELSE 
+                            \STATE \textbf{return} NIL
+                        \ENDIF
+                    \ELSIF{( ($V.min \neq NIL$) \textbf{and} ($key < V.min$) )}
+                        \STATE \textbf{return} V.min
+                    \ELSE
+                        \STATE $max-low = Maximum(V.cluster[high(key)]$
+                        \IF{( ($max-low \neq NIL$) \textbf{and} ( $low(key) < max-low$) )}
+                            \STATE offset = $Successor(V.cluster[high(key)], low(key))$
+                            \STATE \textbf{return} $index(high(key), offset)$
+                        \ELSE
+                            \STATE succ-cluster = $Successor( V.summary, high(key) )$
+                            \IF{(succ-cluster == NIL)}
+                                \STATE \textbf{return} NIL
+                            \ELSE 
+                                \STATE offset = Minimum(V.cluster[succ-cluster])
+                                \STATE \textbf{return} index(succ-cluster, offset)
+                            \ENDIF
+                        \ENDIF
+                        
+                    \ENDIF %fine if principale 
+                \end{algorithmic}
+            \end{algorithm}
+            
+            Iniziamo dal caso base, ovvero la dimensione di \textbf{u} è uguale a 2;
+            In questo caso se la chiave da ricercare si trova nella posizione 0 del determinato cluster, ed esiste \textbf{max} di quel cluster, allora il successore sarà proprio \textbf{max}, perché non ci saranno altri elementi se non key e \textbf{max}. \\
+            Altrimenti ritorniamo NIL, perchè non ci sarà nessun successore.\\
+            Se la dimensione di \textbf{u} è diversa da 2, quindi abbiamo saltato la prima condizione, ed esiste \textbf{min} ed esso è strettamente maggiore di key allora ritorniamo semplicemente \textbf{min}, che sarà appunto il nostro successore.\\
+            Se arriviamo alla terza condizione (else) allora sappiamo che non ci troviamo in un caso base e che key è maggiore o uguale all'elemento minimo. Assegniamo a max-low l'elemento massimo nel cluster di key.\\
+            Se il cluster di key contiene qualche elemento che è maggiore di key, allora sappiamo che il successore di key si trova proprio nel cluster di key. Se il successore di key è all'interno del cluster di key, allora il primo offset determina dove si trova e successivamente restituiamo il successore.\\
+            Altrimenti assegniamo a succ-cluster il numero del successivo cluster non vuoto, aiutandoci con summary. Se succ-cluster è non vuoto assegniamo al secondo offset il primo elemento all'interno di tale cluster e successivamente restituiamo l'elemento minimo di quel cluster.\\
+            \\
+            Per quanto riguarda la complessità possiamo notare che l'algoritmo richiama se stesso, in modo ricorsivo, nella riga 12 (su un albero vEB con dimensione dell'universo $\sqrt[\downarrow]{u}$) o nella riga 15 (su un albero vEB con dimensione dell'universo $\sqrt[\uparrow]{u}$). In ogni caso, la chiamata ricorsiva riguarda un albero vEB con dimensione dell'universo al più $\sqrt[\uparrow]{u}$. La parte restante incluso Minimum e Maximum richiede tempo costante, ovvero O(1).
+            Quindi applicando la ricorrenza (6), Successor viene eseguita nel tempo O(lg lg u).\\\\
+                
+            \textbf{Predecessore}\\\\
+            La procedura Predecessor è simmetrica a quella di Successor, ma con un caso aggiuntivo:
+            \begin{algorithm}
+                \caption{Predecessor(V, key)}
+                \begin{algorithmic}
+                    \IF{($V.universe == 2$)}
+                    
+                        \IF{( ($key == 1$) \textbf{and} ($V.min == 0$) )}
+                            \STATE \textbf{return} 0
+                        \ELSE 
+                            \STATE \textbf{return} NIL
+                        \ENDIF
+                    \ELSIF{( ($V.max \neq NIL$) \textbf{and} ($key > V.max$) )}
+                        \STATE \textbf{return} V.max
+                    \ELSE
+                        \STATE $min-low = Minimum(V.cluster[high(key)]$
+                        \IF{( ($min-low \neq NIL$) \textbf{and} ( $low(key) > min-low$) )}
+                            \STATE offset = $Predecessor(V.cluster[high(key)], low(key))$
+                            \STATE \textbf{return} $index(high(key), offset)$
+                        \ELSE
+                            \STATE pred-cluster = $Predecessor(V.summary, high(key))$
+                            \IF{(pred-cluster == NIL)}
+                                \IF{( ($V.min \neq NIL$) and ($x > V.min$) )}
+                                    \STATE \textbf{return} V.min
+                                \ELSE \textbf{return} NIL
+                                \ENDIF
+                            \ELSE 
+                                \STATE offset = Maximum(V.cluster[pred-cluster])
+                                \STATE \textbf{return} index(pred-cluster, offset)
+                            \ENDIF
+                        \ENDIF
+                        
+                    \ENDIF %fine if principale 
+                \end{algorithmic}
+            \end{algorithm}
+            
+            Il caso aggiuntivo (alle righe 17-18) si verifica quando il predecessore di key, se esiste, non si trova nel cluster di key. Quindi se il predecessore di key è il valore minimo nell'albero vEB V, allora il predecessore non si trova in alcun cluster.\\\\
+            Questo caso extra non influisce sul tempo di esecuzione dell'algoritmo, di conseguenza il costo sarà uguale a quello di Successor, ovvero O(lg lg u).\\
+            
+        
+        \newpage
+        \subsubsection{Insert}
+            Vediamo come inserire un elemento in un albero vEB. Quando inseriamo un elemento, il cluster dove va inserito l'elemento può contenere già un elemento oppure no. Se il cluster ha già un altro elemento, allora il numero di cluster è già nel summary. Se il cluster non ha un altro elemento, allora l'elemento da inserire diventa l'unico elemento nel cluster.
+            
+            \begin{algorithm}
+                \caption{Insert(V, key)}
+                \begin{algorithmic}
+                    \IF{($V.min == NIL$)}
+                        \STATE $V.min = key$
+                        \STATE $V.max = key$
+                    \ELSIF{($key < V.min$)}
+                        \STATE swap(key, V.min)
+                        \IF{($V.universe > 2$)}
+                            \IF{Minimum(V.cluster[high(key)]) == NIL}
+                                \STATE Insert(V.summary, high(key))
+                                \STATE $V.cluster[high(key)].min = low(key)$
+                                \STATE $V.cluster[high(key)].max = low(key)$
+                            \ELSE
+                                Insert(V.cluster[high(key)], low(key))
+                            \ENDIF
+                        \ENDIF
+                        \IF{($key > V.max$)}
+                            $V.max = key$
+                        \ENDIF
+                    \ENDIF
+                \end{algorithmic}
+            \end{algorithm}
+            
+            Innanzitutto è necessario verificare se l'albero è vuoto, se lo è settiamo \textbf{min} e \textbf{max} a key.\\
+            Successivamente alla riga 4 verifichiamo se key è minore del minimo, in tal caso scambiamo min e key. Di conseguenza la nostra key originale diverrà il minimo e il nostro minimo originale diverrà key.\\
+            Se l'albero non si trova nel caso base (ovvero $V.universe > 2$, riga 6) allora dobbiamo determinare se il cluster dove andrà key è vuoto, se lo è, inseriamo il numero di cluster di key nel summary e alle righe 9 e 10 creiamo un nuovo cluster e inseriamo key come \textbf{min} e \textbf{max}.\\
+            Se invece il cluster non è vuoto inseriamo key nel cluster corrispondente.\\
+            Le righe 15-16 hanno il compito di aggiornare il campo \textbf{max} se e solo se esso è minore di key.\\
+            \\
+            Possiamo notare come la ricorrenza (6) caratterizzi anche questo algoritmo, infatti viene eseguita la chiamata ricorsiva o nella riga 8 (su un albero vEB con dimensione dell'universo $\sqrt[\uparrow]{u}$) o nella riga 12 (su un albero vEB con dimensione dell'universo $\sqrt[\downarrow]{u}$). La parte restante dell'algoritmo richiede tempo O(1), di conseguenza applicando la ricorrenza (6) abbiamo che il tempo di esecuzione di questo algoritmo è pari a O(lg lg u).
+            \\\\
+            
+        \subsubsection{Delete}\\
+            
+        
+        
             
 \end{document}
+    
