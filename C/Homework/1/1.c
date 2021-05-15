@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
         // apre il file destinazione in sola scrittura, con troncamento e creazione
         printf("%s\n", buffer);
-        if ((dd = open(buffer, O_WRONLY|O_CREAT|O_TRUNC, MODE)) == -1) {
+        if ((dd = open(buffer, O_WRONLY | O_CREAT | O_TRUNC, MODE)) == -1) {
             perror(buffer);
             exit(1);
         }
