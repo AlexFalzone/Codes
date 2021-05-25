@@ -13,68 +13,78 @@
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <libgen.h>
 
-#define BUFSIZE 4096
-#define MODE 0660
-
-int main(int argc, char *argv[]) {
-    int sd, dd, size, i;
-    char buffer[BUFSIZE];
-    char *p1, *p2;
-
-    // controlla di avere almeno 2 parametri effettivi
-    if (argc < 3) {
-        printf("utilizzo: %s [<sorgente>...] <directory destinazione>\n", argv[0]);
+int main(int argc, char *argv[]) 
+{
+    char buffer[BUFSIZ];
+    struct stat stat_buffer;
+    char* dir_dest = argv[argc - 1];
+    int sd, fd, size;
+    
+    if (argc < 3)
+    {
+        printf("Usage: <file>, <destinazione>\n");
         exit(1);
     }
 
-    for (i = 1; i < argc-1; i++) {
-        // apre il file sorgente di turno in sola lettura
-        printf("%s\t--> ", argv[i]);
-        if ((sd = open(argv[i], O_RDONLY)) == -1) {
+    if ((stat(dir_dest, &stat_buffer)) == -1)
+    {
+        perror("Error stat\n");
+        exit(1);
+    }
+
+    if (!S_ISDIR(stat_buffer.st_mode))
+    {
+        printf("%s non è una directory\n", stat_buffer);
+        exit(1);
+    }
+    
+    for (int i = 0; i < argc - 1; i++)
+    {
+        if ((sd = open(argv[i], O_RDONLY)) == -1)
+        {
             perror(argv[i]);
             exit(1);
         }
 
-        /* prepara in 'buffer' il nome del file di destinazione:
-           <directory destinazione>/<sorgente>                    */
-        strncpy(buffer, argv[argc-1], BUFSIZE);
-        size = strlen(buffer);
-        strncpy(buffer + size, "/", BUFSIZE - size);
-        size++;
-
-        /* isola nel pathname sorgente la parte finale del filename;
-           in alternativa si poteva usare basename()                */
-        p1 = p2 = argv[i];
-        while (*p2 != '\0') {
-            if (*p2 == '/') p1 = p2+1;
-            p2++;
+        /*if ((stat(sd, & stat_buffer)) == -1)
+        {
+            perror("Error stat2\n");
+            exit(1);
         }
-        strncpy(buffer + size, p1, BUFSIZE - size);
+        
+        if (!S_ISREG(stat_buffer.st_mode))
+        {
+            printf("%s non è un file regolare\n", stat_buffer);
+            exit(1);
+        } */  
 
-        // apre il file destinazione in sola scrittura, con troncamento e creazione
-        printf("%s\n", buffer);
-        if ((dd = open(buffer, O_WRONLY | O_CREAT | O_TRUNC, MODE)) == -1) {
+        if ((fd = open(buffer, O_WRONLY | O_TRUNC | O_CREAT)) == -1)
+        {
             perror(buffer);
             exit(1);
         }
-
-        // copia i dati dalla sorgente alla destinazione
-        do {
-            // legge fino ad un massimo di BUFSIZE byte dalla sorgente
-            if ((size = read(sd, buffer, BUFSIZE)) == -1) {
+        
+        do
+        {
+            if ((size = read(sd, buffer, BUFSIZ)) == -1)
+            {
                 perror(argv[1]);
                 exit(1);
             }
-            // scrive i byte letti
-            if (write(dd, buffer, size) == -1) {
+
+            if (write(fd, buffer, size) == -1)
+            {
                 perror(argv[2]);
                 exit(1);
             }
-        } while (size == BUFSIZE);
-
-        // chiude i file attualmente aperti
+        } while (size == BUFSIZ);
+        
         close(sd);
-        close(dd);
+        close(fd);
+        
     }
 }
