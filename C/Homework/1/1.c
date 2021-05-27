@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
             perror(buffer);
             exit(1);
         }
-        
+        w
         do
         {
             if ((size = read(sd, buffer, BUFSIZ)) == -1)
