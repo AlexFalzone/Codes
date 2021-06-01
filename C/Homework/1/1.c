@@ -15,76 +15,79 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <libgen.h>
+#include <errno.h>
 
-int main(int argc, char *argv[]) 
+
+int main(int argc, char const *argv[])
 {
+    struct stat controllo_file;
+    int source_file, dest_file, size;
     char buffer[BUFSIZ];
-    struct stat stat_buffer;
-    char* dir_dest = argv[argc - 1];
-    int sd, fd, size;
-    
+    char *p1, *p2;
+
     if (argc < 3)
     {
-        printf("Usage: <file>, <destinazione>\n");
+        printf("Usage: <file> ... <directory>");
         exit(1);
     }
 
-    if ((stat(dir_dest, &stat_buffer)) == -1)
+    for (int i = 1; i < argc - 1; i++)
     {
-        perror("Error stat\n");
-        exit(1);
-    }
-
-    if (!S_ISDIR(stat_buffer.st_mode))
-    {
-        printf("%s non è una directory\n", stat_buffer);
-        exit(1);
-    }
-    
-    for (int i = 0; i < argc - 1; i++)
-    {
-        if ((sd = open(argv[i], O_RDONLY)) == -1)
+        if ( (source_file = open(argv[i], O_RDONLY)) == -1 )
         {
-            perror(argv[i]);
-            exit(1);
+            //perror(argv[i]);
+            printf("apertura file source non riuscita\n");
+            exit(EXIT_FAILURE);
         }
 
-        /*if ((stat(sd, & stat_buffer)) == -1)
+        strncpy(buffer, argv[argc - 1], BUFSIZ);
+        size = strlen(buffer);
+        strncpy(buffer + size, "/", BUFSIZ - size);
+        size++;
+
+        p1 = p2 = argv[i];
+        while (*p2 != '\0') 
         {
-            perror("Error stat2\n");
-            exit(1);
+            if (*p2 == '/') p1 = p2+1;
+            p2++;
+        }
+        strncpy(buffer + size, p1, BUFSIZ - size);
+
+        if ( (fstat(source_file, &controllo_file)) == -1 )
+        {
+            perror("stat");
+            exit(EXIT_FAILURE);
         }
         
-        if (!S_ISREG(stat_buffer.st_mode))
+        if (!S_ISREG(controllo_file.st_mode))
         {
-            printf("%s non è un file regolare\n", stat_buffer);
-            exit(1);
-        } */  
-
-        if ((fd = open(buffer, O_WRONLY | O_TRUNC | O_CREAT)) == -1)
+            printf("non è un file regolare\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        if ( (dest_file = open(buffer, O_WRONLY|O_TRUNC|O_CREAT, 0660)) == -1 )
         {
             perror(buffer);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
-        w
+
         do
         {
-            if ((size = read(sd, buffer, BUFSIZ)) == -1)
+            if ( (size = read(source_file, buffer, BUFSIZ)) == -1 )
             {
                 perror(argv[1]);
-                exit(1);
+                exit(EXIT_FAILURE);
             }
 
-            if (write(fd, buffer, size) == -1)
+            if (write(dest_file, buffer, size) == -1)
             {
                 perror(argv[2]);
-                exit(1);
+                exit(EXIT_FAILURE);
             }
         } while (size == BUFSIZ);
-        
-        close(sd);
-        close(fd);
-        
+
+        close(source_file);
+        close(dest_file);
     }
+    
 }
