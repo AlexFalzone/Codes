@@ -21,52 +21,51 @@
 #include <sys/stat.h>
 #include <libgen.h>
 #include <unistd.h>
+#include <errno.h>
 
 int main(int argc, char const *argv[])
 {
-  struct stat src_buff, dst_buff;
+  int source_file, dest_file,size;
+  struct stat stat_file_source, stat_file_dest;
+  char *dest_pathname;
   char buffer[BUFSIZ];
-  int src_different_filesystem, dst_different_filesystem, size;
-  char* dst_directory;
-
-
-  if (argc != 3)
+  
+  if (argc < 3)
   {
-    printf("utilizzo: %s <file-esistente> <nuovo-nome-e-o-posizione>\n", argv[0]);
-    exit(1);
-  }
-
-  if (lstat(argv[1], &src_buff) == -1)
-  {
-    perror(argv[1]);
-    exit(1);
+    printf("Usage: <pathname sorgente>, <pathname destinazione>\n");
+    exit(EXIT_FAILURE);
   }
   
-  
-  switch (src_buff.st_mode & S_IFMT)
+  if (lstat(argv[1], &stat_file_source) == -1)
   {
-  case S_IFREG:
+    perror("Source stat error\n");
+    exit(EXIT_FAILURE);
+  }
+
+
+  switch (stat_file_source.st_mode & S_IFMT)
+  {
+  case S_IFREG: //file regolare
+
     strncpy(buffer, argv[2], BUFSIZ);
-    dst_directory = dirname(buffer);
-    if ( stat(dst_directory, &dst_buff) == -1 )
+    dest_pathname = dirname(buffer);
+    if ( (stat(dest_pathname, &stat_file_dest)) == -1 )
     {
-      perror(dst_directory);
-      exit(1);
+      perror("Dest stat error");
+      exit(EXIT_FAILURE);
     }
     
-    if (!S_ISDIR(dst_buff.st_mode))
+    if (!S_ISDIR(stat_file_dest.st_mode))
     {
-      printf("%s non è una directory\n", dst_directory);
-      exit(1);
+      perror("Non è una directory\n");
+      exit(EXIT_FAILURE);
     }
     
-
-    //nel caso il filesystem sia uguale
-    if (src_buff.st_dev == dst_buff.st_dev)
+    if (stat_file_dest.st_dev == stat_file_source.st_dev)
     {
-      printf("Stesso Filesystem\n");
+      printf("Stesso filesystem\n");
 
-      if (link(argv[1], argv[2]) == -1)
+      if (link(argv[1], argv[2]) == -1) 
       {
         perror(argv[2]);
         exit(1);
@@ -74,51 +73,52 @@ int main(int argc, char const *argv[])
     }
     else
     {
-      printf("Diverso Filesystem\n");
-      if ( (src_different_filesystem = open(argv[1], O_RDONLY)) == -1 )
+      printf("Diverso filesystem\n");
+
+      if ( (source_file = open(argv[1], O_RDONLY)) == -1 )
       {
         perror(argv[1]);
-        exit(1);
+        exit(EXIT_FAILURE);
       }
-        
-       if ( (dst_different_filesystem = open(argv[2], O_WRONLY | O_TRUNC | O_CREAT, (src_buff.st_mode & 0777))) == -1 )
+
+      if ( (dest_file = open(argv[2], O_WRONLY|O_TRUNC|O_CREAT, stat_file_source.st_mode & 0777)) == -1 )
       {
         perror(argv[2]);
-        exit(1);
+        exit(EXIT_FAILURE);
       }
-        
+
       do
       {
-        if ( (size = read(src_different_filesystem, buffer, BUFSIZ)) == -1)
+        if ((size = read(source_file, buffer, BUFSIZ)) == -1)
         {
-          perror(argv[1]);
-          exit(1);
+          perror("read error\n");
+          exit(EXIT_FAILURE);
         }
 
-        if (write(dst_different_filesystem, buffer, size) == -1)
+        if (write(dest_file, buffer, size) == -1)
         {
-          perror(argv[2]);
-          exit(1);
+          perror("write error\n");
+          exit(EXIT_FAILURE);
         }
       } while (size == BUFSIZ);
-      close(src_different_filesystem);
-      close(dst_different_filesystem);
     }
+    close(source_file);
+    close(dest_file);
     break;
 
-  case S_IFLNK:
+  case S_IFLNK: //link simbolico
+    
 
     break;
 
   default:
-    printf("Formato non supportato!");
+    printf("Errore, formato non supportato\n");
     break;
   }
-
-  if (unlink(argv[1]) == -1) {
-      perror(argv[1]);
-      exit(1);
+  
+  if (unlink(argv[1]) == -1)
+  {
+    perror("unlink error");
+    exit(EXIT_FAILURE);
   }
-
-
 }
