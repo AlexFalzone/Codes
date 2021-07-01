@@ -5,116 +5,118 @@
 #include <sys/msg.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 #define DIM_MSG 1024
 
 typedef struct 
 {
-    long tipo;
+    long type;
     char testo[DIM_MSG];
+    int end;
 }msg;
 
 
-
-void IN(int num_query, int coda1)
-{    
-    msg messaggio;
-
-    do
-    {
-        fgets(messaggio.testo, DIM_MSG, num_query);
-        messaggio.tipo = 1;
-
-        if ((msgsnd(coda1, &messaggio, strlen(messaggio.testo) + 1, 0) ) == -1)
-        {
-            perror("msgsend");
-            exit(EXIT_FAILURE);
-        }
-    } while (messaggio.testo != 0);
-}
-
-void DB(int coda_in, int coda_out)
+void IN_func(int coda, char* pathname)
 {
+    int open_file;
+    FILE *in;
+    msg messagges;
 
-}
-
-void OUT(int coda_out)
-{
-    msg messaggio;
-    int i = 1, somma = 0;
-
-    while (1)
+    if ((open_file = open(pathname, O_RDONLY)) == -1)
     {
-        if (msgrcv(coda_out, &messaggio, DIM_MSG, 0, 0) == -1)
-        {
-            perror("Errore su ricezione messaggi\n");
-            exit(EXIT_FAILURE);
-        }
-        
-        if (messaggio.testo == -1)
-        {
-            break;
-        }
+        printf("apertura file '%s' non riuscita\n", pathname);
+        exit(EXIT_FAILURE);
+    }
 
-        printf("OUT: ricevuti n.%d valore per ... con totale %8lu\n", i, somma);
-        i++;
-    } 
+    if ((in = fdopen(open_file, "r")) == NULL)
+    {
+        perror("errore conversione file to FILE in IN_func\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    fgets(messagges.testo, DIM_MSG, in);
+
+    messagges.type = 1;
+
+    if (msgsnd(coda, &messagges, strlen(messagges.testo) + 1, 0) == -1)
+    {
+        perror("Errore msgsnd\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
-
-int main(int argc, char const *argv[])
+void DB_func(int coda_in, int coda_out, char* pathname)
 {   
-    int coda_input, coda_output;
-    int chiave_input, chiave_output;
+    msg messagges;
+
+
+
+
+    if (msgrcv(coda_in, &messagges, DIM_MSG, 0, 0) == -1)
+    {
+        perror("Errore msgrcv\n");
+        exit(EXIT_FAILURE);
+    }
+    
+
+}
+
+
+
+int main(int argc, char *argv[])
+{
+    int coda_out, coda_in;
+    key_t chiave_out = 50;
 
     if (argc < 4)
     {
-        printf("Usage: <lookup-database> <db-file> <query-file-1> <query-file-2>");
+        printf("Usage: lookup-database <db-file> <query-file-1> <query-file-2>");
+        exit(EXIT_FAILURE);
+    }
+        
+    if ((coda_in = msgget(IPC_PRIVATE, IPC_CREAT | 0660) == -1))
+    {
+        perror("Errore creazione coda_in\n");
         exit(EXIT_FAILURE);
     }
     
-    if ((coda_input = msgget(chiave_input, IPC_CREAT | 0660)) == -1)
+    if ((coda_out = msgget(chiave_out, IPC_CREAT | 0660) == -1))
     {
-        perror("Errore su creazione coda input\n");
+        perror("Errore creazione coda_out\n");
         exit(EXIT_FAILURE);
     }
-    if ((coda_output = msgget(chiave_output, IPC_CREAT | 0660)) == -1)
-    {
-        perror("Errore su creazione coda input\n");
-        exit(EXIT_FAILURE);
-    }
-    
 
+    //IN1
+    if (fork() == 0)
+    {
+       
+    }
+
+    //IN2
     if (fork() != 0)
     {
-        if (fork() != 0)
-        {
-            if (fork() != 0)
-            {
-                if (fork() != 0)
-                {
-                    wait(NULL);
-                    wait(NULL);
-                    wait(NULL);
-                    wait(NULL);
-                }
-                else
-                {
-                    IN(argv[2], coda_input);
-                    IN(argv[3], coda_input);
-                }
-            }
-            else
-            {
-                DB(coda_input,coda_output);
-            }
-        }   
-        else
-        {
-            OUT(coda_output);
-        }
+           
     }
-    
-    msgctl(coda_input, IPC_RMID, NULL);
-    msgctl(coda_output, IPC_RMID, NULL);
+   
+    //DB
+    if (fork() != 0)
+    {
+                
+    }
+
+    //OUT
+    if (fork() != 0)
+    {
+                
+    }
+     
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+
+    msgctl(coda_in, IPC_RMID, NULL);
+    msgctl(coda_out, IPC_RMID, NULL);
 }
+
