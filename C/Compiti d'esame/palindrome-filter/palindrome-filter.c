@@ -109,6 +109,7 @@ void W_func(int input_si_no, int idsem, int idmem, char *pathname)
     WAIT(idsem, S_FULL);
     WAIT(idsem, S_MUTEX);
     
+    //variante con fwrite o fputs
     fprintf(out, "%s", p);
 
     SIGNAL(idsem, S_MUTEX);
