@@ -40,13 +40,15 @@ typedef struct
 {
     MESG_T type;
     char nome[20];
-    char* corpo[100];
+    char corpo[100];
 } MESSAGE;
 
+MESSAGE msg;
 
 int main(int argc, char *argv[])
 {
     struct sockaddr_in server_addr, client_addr;
+    socklen_t client_addr_len;
     int connect_socket;
     int retcode, buffer;
 
@@ -82,6 +84,21 @@ int main(int argc, char *argv[])
 
         printf("\nServer Ready\n");
 
+        client_addr_len = sizeof(client_addr);
+        
+        while ((connect_socket = accept(connect_socket, (struct sockaddr *) &client_addr, &client_addr_len)) != -1)
+        {
+            printf("Connection established with %s", inet_ntoa(client_addr.sin_addr));
+
+            while (read(connect_socket, &msg, sizeof(MESSAGE)) < 0)
+            {
+                perror("Errore read\n");
+                exit(EXIT_FAILURE);
+            }
+            printf("messaggio da %s: %s", msg.nome, msg.corpo);
+
+        }
+        
 
     }
     else //client
