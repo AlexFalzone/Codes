@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+//import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -20,16 +20,16 @@ public class Docente {
     @NotBlank
     private String cognome;
 
-    @OneToOne(mappedBy = "docente")
-    private Materia materia;
+    // @OneToOne(mappedBy = "docente")
+    // private Materia materia;
 
     public Docente() {
     }
 
-    public Docente(String nome, String cognome, Materia materia) {
+    public Docente(String nome, String cognome) {
         this.nome = nome;
         this.cognome = cognome;
-        this.materia = materia;
+        //this.materia = materia;
     }
 
     public Long getId() {
@@ -56,13 +56,13 @@ public class Docente {
         this.cognome = cognome;
     }
 
-    public Materia getMateria() {
-        return this.materia;
-    }
+    // public Materia getMateria() {
+    //     return this.materia;
+    // }
 
-    public void setMateria(Materia materia) {
-        this.materia = materia;
-    }
+    // public void setMateria(Materia materia) {
+    //     this.materia = materia;
+    // }
 
     @Override
     public String toString() {
@@ -70,7 +70,7 @@ public class Docente {
             " id='" + getId() + "'" +
             ", nome='" + getNome() + "'" +
             ", cognome='" + getCognome() + "'" +
-            ", materia='" + getMateria() + "'" +
+            //", materia='" + getMateria() + "'" +
             "}";
     }
 }

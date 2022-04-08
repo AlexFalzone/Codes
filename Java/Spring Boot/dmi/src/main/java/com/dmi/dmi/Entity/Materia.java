@@ -5,8 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+//import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Materia {
@@ -17,8 +17,8 @@ public class Materia {
     private String nome;
     private String cfu;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "docente_id", referencedColumnName = "id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    //@JoinColumn(name = "docente_id", referencedColumnName = "id")
     private Docente docente;
 
     public Materia() {
