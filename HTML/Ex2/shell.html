@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>
+            html, body
+            {
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                background-color: rgb(255, 255, 255);
+            }
+            #external 
+            {
+                position: absolute;
+                width: 90%;
+                height: 90%;
+                top: 0%;
+                left: 5%;
+                background-color: rgb(255, 255, 255);   
+                
+            }
+            #external .options
+            {
+                background-color: rgb(51, 51, 51);
+                width: 100%;
+                height: 38px;
+                position: absolute;
+                top: 0;
+                border-radius: 15px;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            #external .button_close
+            {
+                background-color: red;
+                color: white;
+                position: absolute;
+                top: 8px;
+                right: 10px;
+                width: 25px;
+                height: 25px;
+                border: 1px solid darkred;
+                border-radius: 25px;
+            }
+            #external .button_close:hover
+            {
+                background-color: darkred;
+                cursor: pointer;
+            }
+
+            #external .screen
+            {   
+                position: absolute;
+                background-color: rgb(26, 25, 25);
+                font-size: 2%;
+                font-weight: 300;
+                color: whitesmoke;
+                width: 100%;
+                height: 100%;
+                border-radius: 10px;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+
+            #external textarea 
+            {
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0);
+                border-color: black;
+                color: whitesmoke;
+                font-size: 16px;
+                font-weight: 400;
+                resize: none;
+                border: 10px;
+                width: 100%;
+                height: 94%;
+                top: 40px;
+                outline: 0;
+            }
+        </style>
+    </head>
+<body>
+    <div id="external">
+        
+        <div class="screen">
+            <textarea>alex@i-use-arch-btw: ~</textarea>
+        </div>
+        <div class="options">
+            <button class="button_close">X</button>
+        </div>
+    </div>
+</body>
+</html>
