@@ -69,5 +69,54 @@
             <div class="bottom-left"></div>
             <div class="bottom-right"></div>
         </div>
+
+        <script>
+            function loop()
+            {
+                var var1;
+                let let1;
+
+                var var2 = 5;
+                let let2 = 10;
+
+
+                console.log(var1);
+                console.log(let1);
+
+                console.log(var2);
+                console.log(let2);
+
+                for(var i = 0; i < 10; i++)
+                {
+                    console.log(i);
+                    console.log("var1 dentro for: " + var1);
+                    console.log("let1 dentro for: " + let1);
+
+                    console.log("var2 dentro for: " + var2);
+                    console.log("let2 dentro for: " + let2);
+
+
+                    var var3;
+                    let let3;
+
+                    var var4 = 15;
+                    let let4 = 20;
+
+                    console.log("var3 dentro for: " + var3);
+                    console.log("let3 dentro for: " + let3);
+
+                    console.log("var4 dentro for: " + var4);
+                    console.log("let4 dentro for: " + let4);
+                }
+
+                console.log("var3 fuori for: " + var3);
+                console.log("let3 fuori for: " + let3);
+
+                console.log("var4 fuori for: " + var4);
+                console.log("let4 fuori for: " + let4);
+            }
+
+        </script>
+
 	</body>
 </html>
