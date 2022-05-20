@@ -2,9 +2,9 @@ var x;
 console.log("x = " + x);
 console.log(navigator);
 
-function neofetch()
+function uname()
 {
-    console.log("neofetch");
+    console.log("uname");
     document.getElementById("figlio").value = " " + navigator.platform;
 }
 
@@ -49,10 +49,14 @@ function enterKeyPressed(event)
         console.log("Enter key pressed");
         x = document.getElementById("figlio").value;
 
-        if(x == " neofetch")
+        if(x == " help")
+        {
+            document.getElementById("figlio").value = " uname, saluto, data, calcolatrice e ip";
+        }
+        else if(x == " uname")
         {
             console.log("x = " + x);
-            neofetch();
+            uname();
         }
         else if(x == " 👋")
         {
@@ -82,7 +86,7 @@ function enterKeyPressed(event)
             console.log("📅");
             document.getElementById("figlio").value = " " + new Date();
         }
-        else if(x.length >= 8 && x != " bluethoot")
+        else if(x.length >= 8)
         {
             sliceAndConvert(x);
         }
