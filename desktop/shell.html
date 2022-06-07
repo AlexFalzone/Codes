@@ -1,0 +1,35 @@
+
+<html>
+    <head>
+        <title>Shell</title>
+        <link rel='stylesheet' type='text/css' media='screen' href='assets/css/shell.css'>
+    </head>
+    <body>
+        <div id = "Blocco">
+            <div class="terminale">
+                <div id="barra">
+                <div id = "kill"class="icone_red" onkeypress="exit(e)">
+                        ❌
+                    </div>
+                    <div class="icone_yellow">
+                        🔧
+                    </div>
+                    <div class="icone_green">
+                        ◻️
+                    </div>
+                    <div class="icone_text">
+                        >
+                    </div>
+                </div>
+                <div id = "contenitore" onkeypress="invio(event);">
+                    <div class="layer" contenteditable="true">
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="assets/js/shell3.js"></script>
+        <script src="assets/js/calcolatrice.js"></script>
+    </body>
+</html>
