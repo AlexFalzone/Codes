@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     int sock, retcode;
     u_int16_t fport;
 
-        if (argc != 3 && argc != 4)
+    if (argc != 3 && argc != 4)
     {
         fprintf(stderr, "Usage: %s <server> <messagge> <port>\n", argv[0]);
         fprintf(stderr, "Usage: %s <directory.mit.edu> <messagge>\n", argv[0]);
